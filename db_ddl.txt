@@ -14,7 +14,8 @@ CREATE TABLE users (
 drop table user_details;
 
 create table user_details (
-	user_id int primary key,
+	id int auto_increment primary key,
+	user_id int,
     name varchar(100),
     email varchar(255) unique not null,
     phone varchar(15) unique not null,
