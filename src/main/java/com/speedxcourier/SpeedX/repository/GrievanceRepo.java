@@ -1,0 +1,14 @@
+package com.speedxcourier.SpeedX.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.speedxcourier.SpeedX.domain.Grievance;
+
+public interface GrievanceRepo extends JpaRepository<Grievance, Long> {
+    
+    @Query(value = "select * from grievance where reportee_id = ?1", nativeQuery = true)
+    public List<Grievance> getGrievancesByReporteeId(Long userId);
+}

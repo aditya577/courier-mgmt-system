@@ -3,6 +3,7 @@ package com.speedxcourier.SpeedX.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.speedxcourier.SpeedX.domain.User;
 import com.speedxcourier.SpeedX.domain.UserDetails;
+import com.speedxcourier.SpeedX.manager.SessionManager;
 import com.speedxcourier.SpeedX.repository.UserDetailsRepo;
 import com.speedxcourier.SpeedX.repository.UserRepo;
-import com.speedxcourier.SpeedX.security.UserManager;
 import com.speedxcourier.SpeedX.util.SpeedXUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class UserService {
     private UserDetailsRepo userDetailsRepo;
 
     @Autowired
-    private UserManager userManager;
+    private SessionManager userManager;
 
     private final String wrongCredsMsg = "Wrong Credentials";
 
@@ -42,7 +43,7 @@ public class UserService {
             return "login";
         else if (HttpMethod.POST.toString().equals(request.getMethod()))
             return processLogin(request);
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     public String signup(HttpServletRequest request) {
@@ -51,19 +52,25 @@ public class UserService {
             return "signup";
         else if (HttpMethod.POST.toString().equals(request.getMethod()))
             return registerUser(request);
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     public String userHome(HttpServletRequest request) {
         log.info("viewUserHome...");
-        if (userLoggedIn(request))
+        if (userManager.userLoggedIn(request))
             return "user_home";
         return "redirect:/login";
     }
 
+    public String getAllUsers(HttpServletRequest request) {
+        List<User> list  = userRepo.getAllCustomerUsers();
+        request.getSession().setAttribute("customersList", list);
+        return "all_users_table";
+    }
+
     public String logout(HttpServletRequest request) {
         log.info("logout...");
-        String sessionUser = userManager.getLoggedInUser(request);
+        String sessionUser = userManager.getLoggedInUsername(request);
         if (SpeedXUtil.isEmpty(sessionUser))
             return "redirect:/login";
         request.getSession().invalidate();
@@ -72,7 +79,7 @@ public class UserService {
         HttpSession session = request.getSession();
         session.setAttribute(SpeedXUtil.MESSAGE, msg);
         session.setAttribute(SpeedXUtil.STATUS_COLOR, SpeedXUtil.COLOR_SUCCESS);
-        return "redirect:/";
+        return "redirect:/index";
     }
 
     private String processLogin(HttpServletRequest request) {
@@ -101,6 +108,11 @@ public class UserService {
         session.setAttribute(SpeedXUtil.MESSAGE, msg);
         session.setAttribute(SpeedXUtil.STATUS_COLOR, SpeedXUtil.COLOR_SUCCESS);
         session.setAttribute(SpeedXUtil.USERNAME, username);
+
+        UserDetails userDetails = userDetailsRepo.findByUserId(user.getId());
+        if(userDetails.getRole().equals(UserDetails.UserRole.ADMIN.toString()))
+            return "redirect:/admin/home";
+            
         return "redirect:/user_home";
     }
 
@@ -108,13 +120,7 @@ public class UserService {
         HttpSession session = request.getSession();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String pass = passwordEncoder.encode(request.getParameter(SpeedXUtil.PASSWORD));
-        SimpleDateFormat sf = new SimpleDateFormat(SpeedXUtil.DATE_YYYYMMDD_HHMMSS);
-        Date dt = null;
-        try {
-            dt = sf.parse(sf.format(new Date()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date dt = SpeedXUtil.getFormattedDate(new Date());
         String username = request.getParameter(SpeedXUtil.USERNAME);
         String role = request.getParameter("role");
         String name = request.getParameter("name");
@@ -172,9 +178,4 @@ public class UserService {
 
     }
 
-    private boolean userLoggedIn(HttpServletRequest request) {
-        String sessionUser = userManager.getLoggedInUser(request);
-        if (SpeedXUtil.isEmpty(sessionUser)) return false;
-        return true;
-    }
 }

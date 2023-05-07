@@ -1,0 +1,16 @@
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  visibility: hidden;
+  text-align: center;
+}
+
+#content {
+  visibility: visible;
+}
+
+a {
+  text-decoration: none;
+}

@@ -30,10 +30,11 @@ drop table package;
 create table package (
 	id int auto_increment primary key,
     user_id int not null,
+    package_type varchar(40),
     source_city varchar(40),
     destination_city varchar(40),
     calculated_price decimal(10, 2),
-    status varchar(40),
+    package_status varchar(40),
     other_details json,
     created_at datetime not null,
     updated_at datetime on update now(),
@@ -45,20 +46,21 @@ drop table package_history;
 create table package_history (
 	id int auto_increment primary key,
     package_id int not null,
-    `event` varchar(40),
-    `from` varchar(40),
-    `to` varchar(40),
+    book_event varchar(40),
+    event_from varchar(40),
+    event_to varchar(40),
     other_details json,
-    `timestamp` datetime not null,
+    created_at datetime not null,
     FOREIGN KEY (package_id) REFERENCES package(id)
 );
 
 drop table grievance;
 create table grievance (
 	id int auto_increment primary key,
+    content varchar(2000),
     reportee_id int not null,
-    assigned_staff_id int not null,
-    `status` varchar(40),
+    assigned_staff_id int,
+    grievance_status varchar(40),
 	created_at datetime not null,
     updated_at datetime on update now(),
     FOREIGN KEY (reportee_id) REFERENCES users(id),
@@ -69,8 +71,8 @@ drop table grievance_history;
 create table grievance_history (
 	id int auto_increment primary key,
     grievance_id int not null,
-    `event` varchar(40),
-    `timestamp` datetime,
+    grievance_event varchar(40),
+    created_at datetime,
     FOREIGN KEY (grievance_id) REFERENCES grievance(id)
 );
 
@@ -78,6 +80,6 @@ drop table report;
 create table report (
 	id int auto_increment primary key,
     report_type varchar(40),
-    `timestamp` datetime,
+    updated_at datetime,
     json_data json
 );

@@ -10,10 +10,9 @@
                 <h1>User Home | <%= session.getAttribute("username") %> (<a href="/logout">logout</a>)</h1>
                 <hr>
                 <jsp:include page="prompt_msg.jsp" />
-                <h2><a href="/package/book">Book Package</a></h2>
-                <h2><a href="/package/user">Check package status</a></h2>
-                <h2><a href="/grievance/file">File Complaint/Grievance</a></h2>
-                <h2><a href="/grievance/user">Check Complaint/Grievance status</a></h2>
+                <h2><a href="/admin/get/users">View All Users</a></h2>
+                <h2><a href="/admin/get/packages">View All Packages</a></h2>
+                <h2><a href="/admin/get/grievances">View All Complaint/Grievance</a></h2>
             </div>
         </div>
         <script src="../../resources/script.js"></script>

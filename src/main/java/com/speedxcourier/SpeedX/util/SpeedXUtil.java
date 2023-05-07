@@ -1,5 +1,9 @@
 package com.speedxcourier.SpeedX.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class SpeedXUtil {
 
     public static final String USERNAME = "username";
@@ -15,6 +19,17 @@ public class SpeedXUtil {
         if (str == null) return true;
         else if (str.trim().equals("")) return true;
         return false;
+    }
+
+    public static Date getFormattedDate(Date date) {
+        SimpleDateFormat sf = new SimpleDateFormat(DATE_YYYYMMDD_HHMMSS);
+        Date dt = null;
+        try {
+            dt = sf.parse(sf.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dt;
     }
     
 }
